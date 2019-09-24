@@ -1,0 +1,31 @@
+---
+- name: Ensure configuration directory exists
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+    mode: 0755
+  become: true
+  with_items:
+    - "{{ ssm_config_path }}"
+
+- name: Ensure configuration file is copied
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ ssm_config_path }}/{{ item.basename }}"
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+    mode: 0755
+  become: true
+  when: item.enabled | bool
+  with_items:
+    - src: "{{ ssm_sender_config }}"
+      enabled: "{{ ssm_receiver_enabled }}"
+      basename: sender.cfg
+    - src: "{{ ssm_receiver_config }}"
+      enabled: "{{ ssm_sender_enabled }}"
+      basename: receiver.cfg
+    - src: "{{ ssm_dns_config }}"
+      enabled: "{{ ssm_receiver_enabled }}"
+      basename: dns

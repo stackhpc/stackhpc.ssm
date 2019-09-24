@@ -1,0 +1,25 @@
+---
+- name: Ensure oci-systemd-hook is installed
+  yum:
+    name: oci-systemd-hook
+    state: installed
+  become: true
+
+- name: Ensure SSM container is running
+  docker_container:
+    exposed_ports: "{{ item.value.exposed_ports | default(omit) }}"
+    image: "{{ item.value.image }}"
+    entrypoint: "{{ item.value.entry_point | default(omit) }}"
+    command: "{{ item.value.command | default(omit) }}"
+    name: "{{ item.value.container_name }}"
+    network_mode: "{{ item.value.network_mode | default(omit) }}"
+    privileged: "{{ item.value.privileged | default(omit) }}"
+    published_ports: "{{ item.value.published_ports | default(omit) }}"
+    read_only: "{{ item.value.read_only | default(omit) }}"
+    restart_policy: "{{ ssm_restart_policy }}"
+    restart_retries: "{{ ssm_restart_retries if ssm_restart_policy == 'on-failure' else omit }}"
+    state: "{{ item.value.enabled | ternary('started', 'absent') }}"
+    tmpfs: "{{ item.value.tmpfs | default(omit) }}"
+    volumes: "{{ item.value.volumes }}"
+  when: item.value.enabled | bool
+  with_dict: "{{ ssm_services }}"
