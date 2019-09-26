@@ -6,10 +6,10 @@
 ssm_action: deploy
 
 # Whether the SSM receiver should enabled.
-ssm_receiver_enabled: true
+ssm_receiver_enabled: false
 
 # Whether the SSM sender should enabled.
-ssm_sender_enabled: true
+ssm_sender_enabled: false
 
 # Service deployment definition.
 ssm_services:
@@ -30,11 +30,17 @@ ssm_services:
       - "ssm_incoming:/var/spool/apel/incoming"
       - "/etc/grid-security:/etc/grid-security:ro"
       - "ssm_logs:/var/log/apel"
+    config_files:
+      - src: "{{ ssm_receiver_config }}"
+        basename: receiver.cfg
+      - src: "{{ ssm_dns_config }}"
+        basename: dns
+
   ssm_sender:
     container_name: ssm_sender
     enabled: "{{ ssm_receiver_enabled }}"
     image: "{{ ssm_image_full }}"
-    command: ssmsend
+    command: '/bin/sh -c "set -eux; trap : TERM INT; (while true; do ssmsend; sleep {{ ssm_send_delay }}; done) & wait"'
     tmpfs:
       - "/run"
       - "/tmp"
@@ -47,6 +53,9 @@ ssm_services:
       - "ssm_outgoing:/var/spool/apel/outgoing"
       - "/etc/grid-security:/etc/grid-security:ro"
       - "ssm_logs:/var/log/apel"
+    config_files:
+      - src: "{{ ssm_sender_config }}"
+        basename: sender.cfg
 
 # Image used to create the container.
 ssm_image:
@@ -94,3 +103,8 @@ ssm_dns_config: dns.j2
 
 # Path to a jinja templated version of https://github.com/apel/ssm/blob/a4c26291537b49feda052c45dff31b342bd7392f/conf/receiver.cfg # noqa
 ssm_receiver_config: receiver.cfg.j2
+
+# Delay in between calls to ssmsend in the same format as sleep.
+# SUFFIX may be 's' for seconds (the default), 'm' for minutes, 'h' for hours or 'd' for days
+# See: man sleep
+ssm_send_delay: 1m

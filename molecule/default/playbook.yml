@@ -5,6 +5,8 @@
     pip_install_packages:
       - name: docker
     ssm_image: ssm
+    ssm_receiver_enabled: true
+    ssm_sender_enabled: true
   pre_tasks:
     - name: install dependencies
       package:
