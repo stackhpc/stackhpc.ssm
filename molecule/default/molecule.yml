@@ -6,7 +6,7 @@ driver:
 lint:
   name: yamllint
 platforms:
-  - name: centos7-docker
+  - name: centos7-docker-ssm
     image: mplachter/docker-centos7-molecule
     command: /usr/sbin/init
     volumes:

@@ -23,11 +23,9 @@ ssm_services:
       - "/tmp"
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
-      # Ensures the container can see which modules are available.
-      - "/lib/modules:/lib/modules:ro"
       - "{{ ssm_config_path }}/receiver.cfg:/etc/apel/receiver.cfg:ro"
       - "{{ ssm_config_path }}/dns:/etc/apel/dns:ro"
-      - "ssm_incoming:/var/spool/apel/incoming"
+      - "{{ ssm_incoming_volume }}:/var/spool/apel/incoming"
       - "/etc/grid-security:/etc/grid-security:ro"
       - "ssm_logs:/var/log/apel"
     config_files:
@@ -40,17 +38,20 @@ ssm_services:
     container_name: ssm_sender
     enabled: "{{ ssm_receiver_enabled }}"
     image: "{{ ssm_image_full }}"
-    command: '/bin/sh -c "set -eux; trap : TERM INT; (while true; do ssmsend; sleep {{ ssm_send_delay }}; done) & wait"'
+    # ssmsend will return a zero exit code even if an error occured. I was hoping
+    # that by using set -e, we would cause the docker container to report that
+    # it was in the restarting state. This would offer a generic way to
+    # monitor the health of the container. As it is, the only way to detect
+    # an error would be to scrape the log output.
+    command: sh -c 'set -eu; while true; do ssmsend; sleep {{ ssm_send_delay }}; done'
     tmpfs:
       - "/run"
       - "/tmp"
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
-      # Ensures the container can see which modules are available.
-      - "/lib/modules:/lib/modules:ro"
       - "{{ ssm_config_path }}/sender.cfg:/etc/apel/sender.cfg:ro"
       - "{{ ssm_config_path }}/dns:/etc/apel/dns:ro"
-      - "ssm_outgoing:/var/spool/apel/outgoing"
+      - "{{ ssm_outgoing_volume }}:/var/spool/apel/outgoing"
       - "/etc/grid-security:/etc/grid-security:ro"
       - "ssm_logs:/var/log/apel"
     config_files:
@@ -91,6 +92,10 @@ ssm_repo_checkout_path: /tmp
 
 # Whether to push images after they have been built.
 ssm_push: false
+
+# Volume names
+ssm_outgoing_volume: ssm_outgoing
+ssm_incoming_volume: ssm_incoming
 
 # Whether to build the image even if an image of the same name and tag exists.
 ssm_force_rebuild: false
