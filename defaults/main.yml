@@ -27,7 +27,7 @@ ssm_services:
       - "/lib/modules:/lib/modules:ro"
       - "{{ ssm_config_path }}/receiver.cfg:/etc/apel/receiver.cfg:ro"
       - "{{ ssm_config_path }}/dns:/etc/apel/dns:ro"
-      - "ssm_incoming:/var/spool/apel/incoming"
+      - "{{ ssm_incoming_volume }}:/var/spool/apel/incoming"
       - "/etc/grid-security:/etc/grid-security:ro"
       - "ssm_logs:/var/log/apel"
     config_files:
@@ -55,7 +55,7 @@ ssm_services:
       - "/lib/modules:/lib/modules:ro"
       - "{{ ssm_config_path }}/sender.cfg:/etc/apel/sender.cfg:ro"
       - "{{ ssm_config_path }}/dns:/etc/apel/dns:ro"
-      - "ssm_outgoing:/var/spool/apel/outgoing"
+      - "{{ ssm_outgoing_volume }}:/var/spool/apel/outgoing"
       - "/etc/grid-security:/etc/grid-security:ro"
       - "ssm_logs:/var/log/apel"
     config_files:
@@ -96,6 +96,10 @@ ssm_repo_checkout_path: /tmp
 
 # Whether to push images after they have been built.
 ssm_push: false
+
+# Volume names
+ssm_outgoing_volume: ssm_outgoing
+ssm_incoming_volume: ssm_incoming
 
 # Whether to build the image even if an image of the same name and tag exists.
 ssm_force_rebuild: false
