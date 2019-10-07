@@ -40,7 +40,12 @@ ssm_services:
     container_name: ssm_sender
     enabled: "{{ ssm_receiver_enabled }}"
     image: "{{ ssm_image_full }}"
-    command: '/bin/sh -c "set -eux; trap : TERM INT; (while true; do ssmsend; sleep {{ ssm_send_delay }}; done) & wait"'
+    # ssmsend will return a zero exit code even if an error occured. I was hoping
+    # that by using set -e, we would cause the docker container to report that
+    # it was in the restarting state. This would offer a generic way to
+    # monitor the health of the container. As it is, the only way to detect
+    # an error would be to scrape the log output.
+    command: sh -c 'set -eu; while true; do ssmsend; sleep {{ ssm_send_delay }}; done'
     tmpfs:
       - "/run"
       - "/tmp"
