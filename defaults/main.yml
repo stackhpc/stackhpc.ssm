@@ -23,8 +23,6 @@ ssm_services:
       - "/tmp"
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
-      # Ensures the container can see which modules are available.
-      - "/lib/modules:/lib/modules:ro"
       - "{{ ssm_config_path }}/receiver.cfg:/etc/apel/receiver.cfg:ro"
       - "{{ ssm_config_path }}/dns:/etc/apel/dns:ro"
       - "{{ ssm_incoming_volume }}:/var/spool/apel/incoming"
@@ -51,8 +49,6 @@ ssm_services:
       - "/tmp"
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
-      # Ensures the container can see which modules are available.
-      - "/lib/modules:/lib/modules:ro"
       - "{{ ssm_config_path }}/sender.cfg:/etc/apel/sender.cfg:ro"
       - "{{ ssm_config_path }}/dns:/etc/apel/dns:ro"
       - "{{ ssm_outgoing_volume }}:/var/spool/apel/outgoing"
