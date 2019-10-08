@@ -1,9 +1,10 @@
 [sender]
 # Either 'STOMP' for STOMP message brokers or 'AMS' for Argo Messaging Service
-protocol: STOMP
+protocol: {{ ssm_protocol }}
 
 [broker]
 
+{% if ssm_auto_broker is defined and ssm_auto_broker | bool %}
 # The SSM will query a BDII to find brokers available.  These details are for the
 # EGI production broker network
 bdii: ldap://lcg-bdii.cern.ch:2170
@@ -12,6 +13,9 @@ network: PROD
 # 'network' commented out). This option must be used for AMS.
 #host:
 #port:
+{% else %}
+host: {{ ams_host }}
+{% endif %}
 
 # broker authentication.  If use_ssl is set, the certificates configured
 # in the mandatory [certificates] section will be used.
@@ -28,11 +32,13 @@ capath: /etc/grid-security/certificates
 #server_cert: /etc/grid-security/servercert.pem
 
 [messaging]
+{% if ssm_protocol == 'AMS' %}
 # If using AMS this is the project that SSM will connect to. Ignored for STOMP.
-ams_project:
+ams_project: {{ ams_project }}
 
 # Queue to which SSM will send messages
-destination:
+destination: {{ ams_destination }}
+{% endif %}
 
 # Outgoing messages will be read and removed from this directory.
 path: /var/spool/apel/outgoing
