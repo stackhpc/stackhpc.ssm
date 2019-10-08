@@ -5,10 +5,14 @@
 # 'upgrade'.
 ssm_action: deploy
 
-ssm_protocol: "AMS"
-ams_host: msg-devel.argo.grnet.gr
-ams_destination: "IRIS-cloud"
-ams_project: "accounting"
+# If using AMS, define this and destination host and queue
+ssm_protocol:
+ams_host:
+ams_destination:
+ams_project:
+
+# Check whether to use BDII to find available brokers
+ssm_auto_broker: false
 
 # Whether the SSM receiver should enabled.
 ssm_receiver_enabled: false
