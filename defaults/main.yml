@@ -5,6 +5,15 @@
 # 'upgrade'.
 ssm_action: deploy
 
+# If using AMS, define this and destination host and queue
+ssm_protocol:
+ams_host:
+ams_destination:
+ams_project:
+
+# Check whether to use BDII to find available brokers
+ssm_auto_broker: false
+
 # Whether the SSM receiver should enabled.
 ssm_receiver_enabled: false
 
@@ -36,7 +45,7 @@ ssm_services:
 
   ssm_sender:
     container_name: ssm_sender
-    enabled: "{{ ssm_receiver_enabled }}"
+    enabled: "{{ ssm_sender_enabled }}"
     image: "{{ ssm_image_full }}"
     # ssmsend will return a zero exit code even if an error occured. I was hoping
     # that by using set -e, we would cause the docker container to report that
@@ -50,7 +59,6 @@ ssm_services:
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
       - "{{ ssm_config_path }}/sender.cfg:/etc/apel/sender.cfg:ro"
-      - "{{ ssm_config_path }}/dns:/etc/apel/dns:ro"
       - "{{ ssm_outgoing_volume }}:/var/spool/apel/outgoing"
       - "/etc/grid-security:/etc/grid-security:ro"
       - "ssm_logs:/var/log/apel"
