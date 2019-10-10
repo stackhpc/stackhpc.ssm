@@ -38,6 +38,9 @@ ams_project: {{ ams_project }}
 
 # Queue to which SSM will send messages
 destination: {{ ams_destination }}
+
+# Token to use to authenticate
+token: {{ ams_token }}
 {% endif %}
 
 # Outgoing messages will be read and removed from this directory.
