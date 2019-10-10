@@ -10,6 +10,7 @@ ssm_protocol:
 ams_host:
 ams_destination:
 ams_project:
+ams_token:
 
 # Check whether to use BDII to find available brokers
 ssm_auto_broker: false
